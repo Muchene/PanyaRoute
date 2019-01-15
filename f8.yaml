@@ -1,0 +1,40 @@
+general:
+  name: panya-route
+components:
+  - expose:
+      - servicePort: 5432
+        containerPort: 5432
+    name: db
+    type: stateful
+    containers:
+      - image: 'postgres:11.1'
+        resources:
+          cpu:
+            min: 0.3
+            max: 0.5
+          memory:
+            min: 512
+            max: 1024
+        readyCheck:
+          command:
+            - /bin/bash
+            - '-c'
+            - pg_isready
+    volumeSize: 10
+    volumeMountPath: /var/lib/postgresql
+  - name: osrm
+    expose:
+      - servicePort: 5000
+        containerPort: 5000
+        accessible-from:
+          - f8-demo
+    type: stateless
+    containers:
+      - dir: .
+        resources:
+          cpu:
+            min: 0.5
+            max: 1
+          memory:
+            min: 256
+            max: 512
